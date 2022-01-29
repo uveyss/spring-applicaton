@@ -15,7 +15,7 @@ public class CreditLimit  implements ICalculateLimit{
 
     @Override
     public BigDecimal calculateCreditLimit(BigDecimal monthlyIncome) {
-        if(getCollateralAmount()!=null )
+        if(getCollateralAmount().compareTo(BigDecimal.ZERO)>0 )
         {
             defaultCreditLimit =calculateCreditLimitWithColleteral(defaultCreditLimit);
         }
@@ -24,8 +24,7 @@ public class CreditLimit  implements ICalculateLimit{
 
     @Override
     public BigDecimal calculateCreditLimitWithColleteral(BigDecimal creditLimitAmount) {
-       BigDecimal calculatedLimit=creditLimitAmount.multiply(BigDecimal.ONE);
-        return calculatedLimit;
+        return creditLimitAmount.multiply(BigDecimal.ONE);
     }
 
     public BigDecimal getCollateralAmount() {

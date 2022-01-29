@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserDao {
@@ -21,7 +22,7 @@ UserRepository userRepository;
         return userRepository.save(user);
     }
 
-    public void deleteById(Long id)
+    public void deleteById(String id)
     {
         userRepository.deleteById(id);
     }
@@ -30,8 +31,15 @@ UserRepository userRepository;
     {
         return userRepository.findByUserTckn(userTckn);
     }
-    public void deleteAll()
+
+    public User findUserById(String id)
     {
-        userRepository.deleteAll();
+        Optional<User> user= userRepository.findById(id);
+        return user.orElseGet(null);
+    }
+
+    public void deleteByTckn(Long tckn)
+    {
+        userRepository.deleteByUserTckn(tckn);
     }
 }

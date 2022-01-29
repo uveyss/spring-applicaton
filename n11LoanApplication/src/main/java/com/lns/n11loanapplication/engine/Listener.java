@@ -2,7 +2,9 @@ package com.lns.n11loanapplication.engine;
 
 import com.lns.n11loanapplication.data.constants.CreditsConstans;
 import com.lns.n11loanapplication.data.dto.UserCreditDto;
+import com.lns.n11loanapplication.data.dto.UserDto;
 import com.lns.n11loanapplication.service.CreditService;
+import com.lns.n11loanapplication.service.UserService;
 import com.lns.n11loanapplication.service.informationService.SendMailService;
 import com.lns.n11loanapplication.service.informationService.SendSmsService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +29,17 @@ public class Listener {
     @Autowired
     SendSmsService sendSmsService;
 
+    @Autowired
+    UserService userService;
+
+
+    private  UserCreditDto userCreditDto;
+    private UserDto userDto;
+
     public Listener(CreditService creditService) {
         this.creditService = creditService;
     }
+
 
 
     @RetryableTopic(
@@ -40,9 +50,11 @@ public class Listener {
     @KafkaListener(topics = "${kafka.topic.calculateCreditScore}", groupId = "${kafka.groupId}")
     public void calculateCreditScoreListener(@Payload String userTckn) {
         try {
-                UserCreditDto userCreditDto = creditService.calculateCreditLimit(userTckn);
-                sendMailService.sendInformation("doganvey@outlook.com", CreditsConstans.getCreditLimitResultMessage() + userCreditDto.getCreditAmount().toString());
-                sendSmsService.sendInformation("5357479473", CreditsConstans.getCreditLimitResultMessage() + userCreditDto.getCreditAmount().toString());
+                userCreditDto=creditService.prepareUserCreditDtoForCreditApproval(Long.valueOf(userTckn));
+                 userDto = userService.findByUserTckn(Long.valueOf(userTckn));
+
+
+                 sendSmsService.sendInformation("+90"+userDto.getUserPhone().toString(), CreditsConstans.getCreditLimitResultMessage() + userCreditDto.getCreditAmount().toString());
             }
             catch (Exception ex)
             {
@@ -52,7 +64,8 @@ public class Listener {
 
     @DltHandler
     public void dlt(String in, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-        log.info(in + " from " + topic);/*Yeni bir topic açılarak log gb olarak elastic search e basılabilir.*/
+        log.warn(in + " from " + topic);/*Yeni bir topic açılarak log gb olarak elastic search e basılabilir.*/
+       // sendMailService.sendInformation(CreditsConstans.getKafkaAdminMail(), CreditsConstans.getSmsDidNotSend() + getUserCreditDto().getUserPhone());
     }
 
 }

@@ -1,5 +1,6 @@
 package com.lns.n11loanapplication.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
@@ -18,14 +19,14 @@ public class CreditDetail implements Serializable {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long creditDetailId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "creditId")
     private Credit credit;
 
     @Column(name = "creditAmount" ,nullable = false)
     private BigDecimal creditAmount;
 
-    @Column(name = "colleteralAmount" ,nullable = false)
+    @Column(name = "colleteralAmount" ,nullable = true)
     private BigDecimal colleteralAmount;
 
 
@@ -35,6 +36,8 @@ public class CreditDetail implements Serializable {
     @Column(name = "creditApprovalDate" ,nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date creditApprovalDate;
+
+
 
     public Long getCreditDetailId() {
         return creditDetailId;
